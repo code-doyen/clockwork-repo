@@ -1,21 +1,185 @@
 ﻿<script>
-function UserAction() {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            document.getElementById("output").innerHTML = this.responseText;
-        }
-    };
-    xhttp.open("GET", "http://localhost:16167/api/currenttime/", true);
-    xhttp.setRequestHeader("Content-type", "application/json");
-    xhttp.send();
+    function UserAction() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                //document.getElementById("output").innerHTML = this.responseText;
+                var tuples = jQuery.parseJSON(this.responseText);
+                var table = "";
+                var tInsertion = "";
+                table += "<tr>";
+                jQuery.each(tuples, function (col, val) {
+                    table += "<td scope='row'>" + val + "</td>";
+                    tInsertion += "<td scope='row'>" + val + "</td>";
+                });
+                table += "</tr>";
 
-}
+                document.getElementById("output").innerHTML += table;
+                document.getElementById("insertion").innerHTML = tInsertion;
+            }
+        };
+        xhttp.open("GET", "http://localhost:25648/api/currenttime?id=1", true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        xhttp.send();
+
+    }
 </script>
-
-<h2>AWH Clockwork Project @ViewData["Version"] on @ViewData["Runtime"]!</h2>
-
-
-<button type="submit" onclick="UserAction()">Get the time</button>
-
-<p id="output"></p>
+<div class="input-group py-3 mb-1">
+    <div class="input-group-prepend">
+        <label class="input-group-text" for="timeZone">Options</label>
+    </div>
+    <select id="timeZone" class="custom-select">
+        <option>(UTC-12:00) International Date Line West</option>
+        <option>(UTC-11:00) Coordinated Universal Time-11</option>
+        <option>(UTC-10:00) Aleutian Islands</option>
+        <option>(UTC-10:00) Hawaii</option>
+        <option>(UTC-09:30) Marquesas Islands</option>
+        <option>(UTC-09:00) Alaska</option>
+        <option>(UTC-09:00) Coordinated Universal Time-09</option>
+        <option>(UTC-08:00) Baja California</option>
+        <option>(UTC-08:00) Coordinated Universal Time-08</option>
+        <option>(UTC-08:00) Pacific Time (US & Canada)</option>
+        <option>(UTC-07:00) Arizona</option>
+        <option>(UTC-07:00) Chihuahua, La Paz, Mazatlan</option>
+        <option>(UTC-07:00) Mountain Time (US & Canada)</option>
+        <option>(UTC-06:00) Central America</option>
+        <option>(UTC-06:00) Central Time (US & Canada)</option>
+        <option>(UTC-06:00) Easter Island</option>
+        <option>(UTC-06:00) Guadalajara, Mexico City, Monterrey</option>
+        <option>(UTC-06:00) Saskatchewan</option>
+        <option>(UTC-05:00) Bogota, Lima, Quito, Rio Branco</option>
+        <option>(UTC-05:00) Chetumal</option>
+        <option>(UTC-05:00) Eastern Time (US & Canada)</option>
+        <option>(UTC-05:00) Haiti</option>
+        <option>(UTC-05:00) Havana</option>
+        <option>(UTC-05:00) Indiana (East)</option>
+        <option>(UTC-04:00) Asuncion</option>
+        <option>(UTC-04:00) Atlantic Time (Canada)</option>
+        <option>(UTC-04:00) Caracas</option>
+        <option>(UTC-04:00) Cuiaba</option>
+        <option>(UTC-04:00) Caracas</option>
+        <option>(UTC-04:00) Georgetown, La Paz, Manaus, San Juan</option>
+        <option>(UTC-04:00) Santiago</option>
+        <option>(UTC-04:00) Turks and Caicos</option>
+        <option>(UTC-03:30) Newfoundland</option>
+        <option>(UTC-03:00) Araguaina</option>
+        <option>(UTC-03:00) Brasilia</option>
+        <option>(UTC-03:00) Cayenne, Fortaleza</option>
+        <option>(UTC-03:00) City of Buenos Aires</option>
+        <option>(UTC-03:00) Greenland</option>
+        <option>(UTC-03:00) Montevideo</option>
+        <option>(UTC-03:00) Punta Arenas</option>
+        <option>(UTC-03:00) Saint Pierre and Miquelon</option>
+        <option>(UTC-03:00) Salvador</option>
+        <option>(UTC-02:00) Coordinated Universal Time-02</option>
+        <option>(UTC-01:00) Azores</option>
+        <option>(UTC-01:00) Cabo Verde Is.</option>
+        <option selected>(UTC) Coordinated Universal Time</option>
+        <option>(UTC+00:00) Casablanca</option>
+        <option>(UTC+00:00) Dublin, Edinburgh, Lisbon, London</option>
+        <option>(UTC+00:00) Monrovia, Reykjavik</option>
+        <option>(UTC+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna</option>
+        <option>(UTC+01:00) Belgrade, Bratislava, Budapest, Ljubljana, Prague</option>
+        <option>(UTC+01:00) Brussels, Copenhagen, Madrid, Paris</option>
+        <option>(UTC+01:00) Sarajevo, Skopje, Warsaw, Zagreb</option>
+        <option>(UTC+01:00) West Central Africa</option>
+        <option>(UTC+01:00) Windhoek</option>
+        <option>(UTC+02:00) Amman</option>
+        <option>(UTC+02:00) Athens, Bucharest</option>
+        <option>(UTC+02:00) Beirut</option>
+        <option>(UTC+02:00) Cairo</option>
+        <option>(UTC+02:00) Chisinau</option>
+        <option>(UTC+02:00) Damascus</option>
+        <option>(UTC+02:00) Gaza, Hebron</option>
+        <option>(UTC+02:00) Harare, Pretoria</option>
+        <option>(UTC+02:00) Helsinki, Kyiv, Riga, Sofia, Tallinn, Vilnius</option>
+        <option>(UTC+02:00) Jerusalem</option>
+        <option>(UTC+02:00) Kaliningrad</option>
+        <option>(UTC+02:00) Khartoum</option>
+        <option>(UTC+02:00) Tripoli</option>
+        <option>(UTC+03:00) Baghdad</option>
+        <option>(UTC+03:00) Istanbul</option>
+        <option>(UTC+03:00) Kuwait, Riyadh</option>
+        <option>(UTC+03:00) Minsk</option>
+        <option>(UTC+03:00) Moscow, St. Petersburg, Volgograd</option>
+        <option>(UTC+03:00) Nairobi</option>
+        <option>(UTC+03:30) Tehran</option>
+        <option>(UTC+04:00) Abu Dhabi, Muscat</option>
+        <option>(UTC+04:00) Astrakhan, Ulyanovsk</option>
+        <option>(UTC+04:00) Baku</option>
+        <option>(UTC+04:00) Izhevsk, Samara</option>
+        <option>(UTC+04:00) Port Louis</option>
+        <option>(UTC+04:00) Saratov</option>
+        <option>(UTC+04:00) Tbilisi</option>
+        <option>(UTC+04:00) Yerevan</option>
+        <option>(UTC+04:30) Kabul</option>
+        <option>(UTC+05:00) Ashgabat, Tashkent</option>
+        <option>(UTC+05:00) Ekaterinburg</option>
+        <option>(UTC+05:00) Islamabad, Karachi</option>
+        <option>(UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi</option>
+        <option>(UTC+05:30) Sri Jayawardenepura</option>
+        <option>(UTC+05:45) Kathmandu</option>
+        <option>(UTC+06:00) Astana</option>
+        <option>(UTC+06:00) Dhaka</option>
+        <option>(UTC+06:00) Omsk</option>
+        <option>(UTC+06:30) Yangon (Rangoon)</option>
+        <option>(UTC+07:00) Bangkok, Hanoi, Jakarta</option>
+        <option>(UTC+07:00) Barnaul, Gorno-Altaysk</option>
+        <option>(UTC+07:00) Hovd</option>
+        <option>(UTC+07:00) Krasnoyarsk</option>
+        <option>(UTC+07:00) Novosibirsk</option>
+        <option>(UTC+07:00) Tomsk</option>
+        <option>(UTC+08:00) Beijing, Chongqing, Hong Kong, Urumqi</option>
+        <option>(UTC+08:00) Irkutsk</option>
+        <option>(UTC+08:00) Kuala Lumpur, Singapore</option>
+        <option>(UTC+08:00) Perth</option>
+        <option>(UTC+08:00) Taipei</option>
+        <option>(UTC+08:00) Ulaanbaatar</option>
+        <option>(UTC+08:30) Pyongyang</option>
+        <option>(UTC+08:45) Eucla</option>
+        <option>(UTC+09:00) Chita</option>
+        <option>(UTC+09:00) Osaka, Sapporo, Tokyo</option>
+        <option>(UTC+09:00) Seoul</option>
+        <option>(UTC+09:00) Yakutsk</option>
+        <option>(UTC+09:30) Adelaide</option>
+        <option>(UTC+09:30) Darwin</option>
+        <option>(UTC+10:00) Brisbane</option>
+        <option>(UTC+10:00) Canberra, Melbourne, Sydney</option>
+        <option>(UTC+10:00) Guam, Port Moresby</option>
+        <option>(UTC+10:00) Hobart</option>
+        <option>(UTC+10:00) Vladivostok</option>
+        <option>(UTC+10:30) Lord Howe Island</option>
+        <option>(UTC+11:00) Bougainville Island</option>
+        <option>(UTC+11:00) Chokurdakh</option>
+        <option>(UTC+11:00) Magadan</option>
+        <option>(UTC+11:00) Norfolk Island</option>
+        <option>(UTC+11:00) Sakhalin</option>
+        <option>(UTC+11:00) Solomon Is., New Caledonia</option>
+        <option>(UTC+12:00) Anadyr, Petropavlovsk-Kamchatsky</option>
+        <option>(UTC+12:00) Auckland, Wellington</option>
+        <option>(UTC+12:00) Coordinated Universal Time+12</option>
+        <option>(UTC+12:00) Fiji</option>
+        <option>(UTC+12:45) Chatham Islands</option>
+        <option>(UTC+13:00) Coordinated Universal Time+13</option>
+        <option>(UTC+13:00) Nuku'alofa</option>
+        <option>(UTC+13:00) Samoa</option>
+        <option>(UTC+14:00) Kiritimati Island</option>
+    </select>
+    <div class="input-group-append">
+        <button class="btn btn-outline-success" type="submit" onclick="UserAction()" data-toggle="collapse" data-target="#timeZone">Get the time</button>
+    </div>
+</div>
+<table class="table table-hover table-responsive-lg">
+    <thead>
+        <tr>
+            <th scope="col">Id#</th>
+            <th scope="col">Server Time</th>
+            <th scope="col">Client IP</th>
+            <th scope="col">UTC Time</th>
+        </tr>
+    </thead>
+    <tbody id="output">
+        <tr id="insertion" class="alert-success"></tr>
+        <!--additional entries added via above with javaScript xhttp request and Jquery -->
+    </tbody>
+</table>

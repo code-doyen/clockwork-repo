@@ -9,8 +9,9 @@ namespace Clockwork.API.Controllers
     {
         // GET api/currenttime
         [HttpGet]
-        public IActionResult Get()
+        public IActionResult Get(int selectedIndex, string timeZone)
         {
+            Console.WriteLine(selectedIndex + timeZone);
             var utcTime = DateTime.UtcNow;
             var serverTime = DateTime.Now;
             var ip = this.HttpContext.Connection.RemoteIpAddress.ToString();

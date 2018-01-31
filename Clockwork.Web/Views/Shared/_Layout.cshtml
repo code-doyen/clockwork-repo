@@ -1,10 +1,31 @@
-﻿<!DOCTYPE html>
-<html>
+﻿<!doctype html>
+<html lang="en">
 <head>
-    <title>@ViewBag.Title</title>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes" />
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="~/Content/bootstrap.css">
+    <script type="text/javascript" src="~/Scripts/modernizr-2.8.3.js"></script>
 </head>
 <body>
-	@RenderBody()
+    
+        <nav class="navbar navbar-expand navbar-dark flex-column flex-md-row bg-dark">
+            <a class="navbar-brand display-1" href="#">
+                AWH Clockwork Project @ViewData["Version"] on @ViewData["Runtime"]!
+            </a>
+        </nav>
+    
+    <div class="container body-content ">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - David Vollmar's .NET Application</p>
+        </footer>
+    </div>
+
+    <script type="text/javascript" src="~/Scripts/jquery-3.3.1.js"></script>
+    <script type="text/javascript" src="~/Scripts/bootstrap.js"></script>
+    <script type="text/javascript" src="~/Scripts/respond.js"></script>
+    @RenderSection("scripts", required: false)
 </body>
 </html>
