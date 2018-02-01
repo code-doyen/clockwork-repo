@@ -1,5 +1,36 @@
 ﻿<script>
+    document.onreadystatechange = () => {
+        if (document.readyState === 'complete') {
+            // document ready
+            PopulateTable();
+        }
+    };
+
+    function PopulateTable() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                //document.getElementById("output").innerHTML = this.responseText;
+                var tuples = jQuery.parseJSON(this.responseText);
+                var table = "";
+                for (var t = 0; t < tuples.length; t++) {
+                    table += "<tr>";
+                    jQuery.each(tuples[t], function (col, val) {
+                        table += "<td scope='row'>" + val + "</td>";
+                    });
+                    table += "</tr>";
+                }
+                console.log(tuples);
+                document.getElementById("output").innerHTML += table;
+            }
+        };
+        xhttp.open("GET", "http://localhost:25648/api/currenttime/selectall", true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        xhttp.send();
+    }
     function UserAction() {
+        var timeIndex = document.getElementById("timeZone").selectedIndex;
+       // var timeString = document.getElementById("timeZone").value;
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
@@ -13,20 +44,19 @@
                     tInsertion += "<td scope='row'>" + val + "</td>";
                 });
                 table += "</tr>";
-
                 document.getElementById("output").innerHTML += table;
                 document.getElementById("insertion").innerHTML = tInsertion;
+                document.getElementById("insertion").lastChild.innerHTML += '<i class="material-icons">alarm_on</i>';
             }
         };
-        xhttp.open("GET", "http://localhost:25648/api/currenttime?id=1", true);
+        xhttp.open("GET", "http://localhost:25648/api/currenttime?timeId=" + timeIndex, true);
         xhttp.setRequestHeader("Content-type", "application/json");
         xhttp.send();
-
     }
 </script>
 <div class="input-group py-3 mb-1">
     <div class="input-group-prepend">
-        <label class="input-group-text" for="timeZone">Options</label>
+        <label class="input-group-text" for="timeZone"><i class="material-icons">update</i>Options</label>
     </div>
     <select id="timeZone" class="custom-select">
         <option>(UTC-12:00) International Date Line West</option>
@@ -166,7 +196,7 @@
         <option>(UTC+14:00) Kiritimati Island</option>
     </select>
     <div class="input-group-append">
-        <button class="btn btn-outline-success" type="submit" onclick="UserAction()" data-toggle="collapse" data-target="#timeZone">Get the time</button>
+        <button class="btn btn-outline-success" type="submit" onclick="UserAction()">Get the time</button>
     </div>
 </div>
 <table class="table table-hover table-responsive-lg">

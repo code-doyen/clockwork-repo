@@ -3,17 +3,17 @@ using Microsoft.AspNetCore.Mvc;
 using Clockwork.API.Models;
 
 namespace Clockwork.API.Controllers
-{
-    [Route("api/[controller]")]
+{    
     public class CurrentTimeController : Controller
     {
         // GET api/currenttime
         [HttpGet]
-        public IActionResult Get(int selectedIndex, string timeZone)
+        [Route("api/[controller]")]
+        public IActionResult Get(int timeID)
         {
-            Console.WriteLine(selectedIndex + timeZone);
+            Console.WriteLine(timeID);
             var utcTime = DateTime.UtcNow;
-            var serverTime = DateTime.Now;
+            var serverTime = DateTime.Now;         
             var ip = this.HttpContext.Connection.RemoteIpAddress.ToString();
 
             var returnVal = new CurrentTimeQuery
@@ -34,9 +34,17 @@ namespace Clockwork.API.Controllers
                 {
                     Console.WriteLine(" - {0}", CurrentTimeQuery.UTCTime);
                 }
+                
             }
-
+            Console.WriteLine(serverTime.AddHours(3).ToLocalTime());
             return Ok(returnVal);
+        }
+        // GET api/selectall
+        [HttpGet]
+        [Route("api/[controller]/selectall")]
+        public IActionResult SelectAll()
+        {
+             return Ok(new ClockworkContext().CurrentTimeQueries);
         }
     }
 }
