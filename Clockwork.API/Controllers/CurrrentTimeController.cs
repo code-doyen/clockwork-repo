@@ -15,6 +15,7 @@ namespace Clockwork.API.Controllers
             var utcTime = DateTime.UtcNow;
             var serverTime = DateTime.Now;         
             var ip = this.HttpContext.Connection.RemoteIpAddress.ToString();
+           // TimeZoneInfo cet = TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time");
 
             var returnVal = new CurrentTimeQuery
             {
@@ -22,7 +23,7 @@ namespace Clockwork.API.Controllers
                 ClientIp = ip,
                 Time = serverTime
             };
-
+            
             using (var db = new ClockworkContext())
             {
                 db.CurrentTimeQueries.Add(returnVal);
@@ -36,7 +37,15 @@ namespace Clockwork.API.Controllers
                 }
                 
             }
-            Console.WriteLine(serverTime.AddHours(3).ToLocalTime());
+            // TimeZoneInfo.FindSystemTimeZoneById("id");
+            //DateTime currentTime = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+            var infos = TimeZoneInfo.GetSystemTimeZones();
+            foreach (var info in infos)
+            {
+                
+                Console.WriteLine(info.StandardName);
+                //Console.WriteLine(info.DisplayName);
+            }
             return Ok(returnVal);
         }
         // GET api/selectall
