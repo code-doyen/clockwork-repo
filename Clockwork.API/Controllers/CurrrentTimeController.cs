@@ -6,22 +6,25 @@ namespace Clockwork.API.Controllers
 {    
     public class CurrentTimeController : Controller
     {
-        // GET api/currenttime
-        [HttpGet]
+        // Post api/currenttime
+        [HttpPost]
         [Route("api/[controller]")]
-        public IActionResult Get(int timeID)
+        public IActionResult Post([FromBody] int timeID)
         {
-            Console.WriteLine(timeID);
+            //Stores requested timeszone's metadata
+            var timeZone = GetTimeZone(timeID);
             var utcTime = DateTime.UtcNow;
-            var serverTime = DateTime.Now;         
+            //Get server time in the requested time zone
+            var serverTime = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById(timeZone.Id));         
             var ip = this.HttpContext.Connection.RemoteIpAddress.ToString();
-           // TimeZoneInfo cet = TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time");
+            var timeZoneStamp = timeZone.DisplayName;
 
             var returnVal = new CurrentTimeQuery
             {
                 UTCTime = utcTime,
                 ClientIp = ip,
-                Time = serverTime
+                Time = serverTime,
+                TimeZoneStamp = timeZoneStamp
             };
             
             using (var db = new ClockworkContext())
@@ -37,23 +40,57 @@ namespace Clockwork.API.Controllers
                 }
                 
             }
-            // TimeZoneInfo.FindSystemTimeZoneById("id");
-            //DateTime currentTime = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-            var infos = TimeZoneInfo.GetSystemTimeZones();
-            foreach (var info in infos)
+            var tableAlert = "";
+            tableAlert += "<tr><td scope='row'>" + returnVal.CurrentTimeQueryId + "</td>";
+            tableAlert += "<td scope='row'>" + returnVal.Time + "</td>";
+            tableAlert += "<td scope='row'>" + returnVal.ClientIp + "</td>";
+            tableAlert += "<td scope='row'>" + returnVal.UTCTime + "</td>";
+            tableAlert += "<td scope='row'>" + returnVal.TimeZoneStamp + "</td></tr>";
+            return Ok(tableAlert);
+        }
+        // GET api/currenttime/zoneselector
+        [HttpGet]
+        [Route("api/[controller]/zoneselector")]
+        public IActionResult ZoneSelector()
+        {
+            var zones = "";
+            foreach (var info in TimeZoneInfo.GetSystemTimeZones())
             {
-                
-                Console.WriteLine(info.StandardName);
-                //Console.WriteLine(info.DisplayName);
+                if(TimeZoneInfo.Local.DisplayName.Equals(info.DisplayName)){
+                    zones += "<option selected>"+ info.DisplayName + "</option>";
+                }
+                else
+                {
+                    zones += "<option>" + info.DisplayName + "</option>";
+                }
             }
-            return Ok(returnVal);
+            return Ok(zones);
         }
         // GET api/selectall
         [HttpGet]
         [Route("api/[controller]/selectall")]
         public IActionResult SelectAll()
         {
-             return Ok(new ClockworkContext().CurrentTimeQueries);
+            var table = "";
+            using (var db = new ClockworkContext())
+            {
+                foreach (var CurrentTimeQuery in db.CurrentTimeQueries)
+                {
+                    table += "<tr><td scope='row'>" + CurrentTimeQuery.CurrentTimeQueryId + "</td>";
+                    table += "<td scope='row'>" + CurrentTimeQuery.Time + "</td>";
+                    table += "<td scope='row'>" + CurrentTimeQuery.ClientIp + "</td>";
+                    table += "<td scope='row'>" + CurrentTimeQuery.UTCTime + "</td>";
+                    table += "<td scope='row'>" + CurrentTimeQuery.TimeZoneStamp + "</td></tr>";
+                }
+
+            }
+            return Ok(table);
+            //return Ok(new ClockworkContext().CurrentTimeQueries);
+        }
+        // Not an action method.
+        [NonAction]
+        private TimeZoneInfo GetTimeZone(int id) {
+            return TimeZoneInfo.GetSystemTimeZones()[id];
         }
     }
 }
