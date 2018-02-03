@@ -4,6 +4,9 @@
             // document ready
             PopulateSelector();
             PopulateTable();
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            });
         }
     };
     function PopulateSelector() {
@@ -47,17 +50,17 @@
     <div class="input-group-prepend">
         <label class="input-group-text" for="timeZone"><i class="material-icons">update</i>Options</label>
     </div>
-    <select id="timeZone" class="custom-select">
+    <select id="timeZone" class="custom-select" tabindex="0" data-toggle="tooltip" title="Adjusts server time to requested time zone.">
         <!--table entries added via above with javaScript xhttp request-->
     </select>
     <div class="input-group-append">
-        <button class="btn btn-outline-success" type="submit" onclick="UserAction()">Get the time</button>
+        <button class="btn btn-outline-success" type="submit" onclick="UserAction()" tabindex="1" data-toggle="tooltip" title="Saves requested server and time zone. Additionally, commits current UTC-time and client IP.">Get the time</button>
     </div>
 </div>
 <table class="table table-hover table-responsive-lg">
     <thead>
         <tr>
-            <th scope="col">Id#</th>
+            <th scope="col" >Id#</th>
             <th scope="col">Server Time</th>
             <th scope="col">Client IP</th>
             <th scope="col">UTC Time</th>
