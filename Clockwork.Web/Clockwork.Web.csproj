@@ -95,6 +95,7 @@
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\material-icons.css" />
+    <Content Include="favicon.ico" />
     <Content Include="Fonts\MaterialIcons-Regular.svg" />
     <Content Include="Fonts\codepoints" />
     <Content Include="Fonts\MaterialIcons-Regular.eot" />

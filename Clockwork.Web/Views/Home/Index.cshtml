@@ -21,6 +21,7 @@
                         "<option value='" + response[i].BaseUtcOffset + "'>" + response[i].DisplayName + "</option>");
                 } 
                 document.getElementById("timeZone").innerHTML = zones;
+                document.getElementById("btn").disabled = false;
             }
         };
         xhttp.open("GET", "http://localhost:25648/api/currenttime/zoneselector", true);
@@ -35,9 +36,9 @@
                 var table = "";
                 for (var tr = 0; tr < response.length; tr++) {
                     table += "<tr><td scope='row'>" + response[tr].currentTimeQueryId + "</td>";
-                    table += "<td scope='row'>" + response[tr].time + "</td>";
+                    table += "<td scope='row'>" + moment(response[tr].time).format("MM/DD/YYYY hh:mm:ss A") + "</td>"; 
                     table += "<td scope='row'>" + response[tr].clientIp + "</td>";
-                    table += "<td scope='row'>" + response[tr].utcTime + "</td>";
+                    table += "<td scope='row'>" + moment(response[tr].utcTime).format("MM/DD/YYYY hh:mm:ss A") + "</td>";
                     table += "<td scope='row'>" + (response[tr].timeZoneStamp[0] === "-" ? "UTC" + response[tr].timeZoneStamp : "UTC+" + response[tr].timeZoneStamp) + "</td></tr>";
                 }
                 document.getElementById("output").innerHTML += table;
@@ -63,9 +64,9 @@
                 PopulateTable();
                 var response = JSON.parse(this.responseText);
                 var tableAlert = "<tr><td scope='row'>" + response.currentTimeQueryId + "</td>";
-                tableAlert += "<td scope='row'>" + response.time + "</td>";
+                tableAlert += "<td scope='row'>" + moment(response.time.replace("Z", "")).format("MM/DD/YYYY hh:mm:ss A") +"</td>";
                 tableAlert += "<td scope='row'>" + response.clientIp + "</td>";
-                tableAlert += "<td scope='row'>" + response.utcTime + "</td>";
+                tableAlert += "<td scope='row'>" + moment(response.utcTime.replace("Z", "")).format("MM/DD/YYYY hh:mm:ss A") + "</td>";
                 tableAlert += "<td scope='row'>" + (response.timeZoneStamp[0] === "-" ? "UTC" + response.timeZoneStamp : "UTC+" + response.timeZoneStamp) + "</td></tr>";
                 document.getElementById("insertion").innerHTML += tableAlert;
                 document.getElementById("insertion").lastChild.innerHTML += '<i class="material-icons float-right">alarm_on</i>';
@@ -90,8 +91,8 @@
             <input id="daylightsavings" type="checkbox">
                 <i class="material-icons">brightness_medium</i>Daylight Savings
         </label>
-        <button class="btn btn-outline-success" type="submit" onclick="UserAction()" tabindex="3" data-toggle="tooltip"
-                title="Saves the server time in requested time zone offset">Get the time</button>
+        <button id="btn" class="btn btn-outline-success" type="submit" onclick="UserAction()" tabindex="3" data-toggle="tooltip"
+                title="Saves the server time in requested time zone offset" disabled>Get the time</button>
     </div>
 </div>
 <table class="table table-hover table-responsive-lg">

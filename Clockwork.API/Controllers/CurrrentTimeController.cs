@@ -23,29 +23,31 @@ namespace Clockwork.API.Controllers
                 timeOffset.Minutes = -timeOffset.Minutes;
                 timeOffset.Seconds = -timeOffset.Seconds;
             }
+            if (timeOffset.IsDaylightSavings)
+            {
+                timeOffset.Hours += 1;
+            }
 
+            var utcTime = DateTime.UtcNow;
+            //Get server time in the requested time zone
+            var serverTime = DateTime.Now.ToUniversalTime();
+            var serverTimeZoneAdjusted = serverTime.AddHours(timeOffset.Hours).AddMinutes(timeOffset.Minutes).AddSeconds(timeOffset.Seconds);
+            var ip = this.HttpContext.Connection.RemoteIpAddress.ToString();
+            var timeZoneStamp = serverTimeZoneAdjusted.Subtract(serverTime).ToString();
 
             //Stores requested timeszone's metadata
             //var timeZone = TimeZoneInfo.GetSystemTimeZones()[timeID];
-            var utcTime = DateTime.UtcNow;
-            //Get server time in the requested time zone
+            //var utcTime = DateTime.UtcNow;
             //var serverTime = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById(timeZone.Id)); 
-            var serverTime = DateTime.Now.ToUniversalTime();
-            var serverTimeZoneAdjusted = serverTime.AddHours(timeOffset.Hours).AddMinutes(timeOffset.Minutes);
-            var ip = this.HttpContext.Connection.RemoteIpAddress.ToString();
+            //var ip = this.HttpContext.Connection.RemoteIpAddress.ToString()
             //var timeZoneStamp = serverTime.GetUtcOffset(serverTime).ToString();
-            var timeZoneStamp = serverTimeZoneAdjusted.Subtract(serverTime).ToString();
-            var test = serverTime.IsDaylightSavingTime();
             //var timeZoneStamp = timeZone.GetUtcOffset(serverTime).ToString();
-           
-
-
 
             var returnVal = new CurrentTimeQuery
             {
                 UTCTime = utcTime,
                 ClientIp = ip,
-                Time = serverTime,
+                Time = serverTimeZoneAdjusted,
                 TimeZoneStamp = timeZoneStamp
             };
 
