@@ -13,7 +13,14 @@
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
-                document.getElementById("timeZone").innerHTML = this.responseText;
+                var response = JSON.parse(this.responseText);
+                var zones = "";
+                for (var i = 0; i < response.length; i++) {
+                    zones += (response[i].StandardName === "Coordinated Universal Time" ?
+                        "<option selected value='" + response[i].BaseUtcOffset + "'>" + response[i].DisplayName + "</option>" :
+                        "<option value='" + response[i].BaseUtcOffset + "'>" + response[i].DisplayName + "</option>");
+                } 
+                document.getElementById("timeZone").innerHTML = zones;
             }
         };
         xhttp.open("GET", "http://localhost:25648/api/currenttime/zoneselector", true);
@@ -24,7 +31,16 @@
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
-                document.getElementById("output").innerHTML += this.responseText;
+                var response = JSON.parse(this.responseText);
+                var table = "";
+                for (var tr = 0; tr < response.length; tr++) {
+                    table += "<tr><td scope='row'>" + response[tr].currentTimeQueryId + "</td>";
+                    table += "<td scope='row'>" + response[tr].time + "</td>";
+                    table += "<td scope='row'>" + response[tr].clientIp + "</td>";
+                    table += "<td scope='row'>" + response[tr].utcTime + "</td>";
+                    table += "<td scope='row'>" + (response[tr].timeZoneStamp[0] === "-" ? "UTC" + response[tr].timeZoneStamp : "UTC+" + response[tr].timeZoneStamp) + "</td></tr>";
+                }
+                document.getElementById("output").innerHTML += table;
             }
         };
         xhttp.open("GET", "http://localhost:25648/api/currenttime/selectall", true);
@@ -33,28 +49,49 @@
     }
     function UserAction() {
         var xhttp = new XMLHttpRequest();
+        var timeOffset = document.getElementById("timeZone").value.split(':');
+        var timeObj = {
+            Hours: timeOffset[0],
+            Minutes: timeOffset[1],
+            Seconds: timeOffset[2],
+            IsDaylightSavings: document.getElementById("daylightsavings").checked
+        };
+         
         xhttp.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
                 document.getElementById("output").innerHTML = '<tr id="insertion" class="alert-success"></tr>';
                 PopulateTable();
-                document.getElementById("insertion").innerHTML += this.responseText;
+                var response = JSON.parse(this.responseText);
+                var tableAlert = "<tr><td scope='row'>" + response.currentTimeQueryId + "</td>";
+                tableAlert += "<td scope='row'>" + response.time + "</td>";
+                tableAlert += "<td scope='row'>" + response.clientIp + "</td>";
+                tableAlert += "<td scope='row'>" + response.utcTime + "</td>";
+                tableAlert += "<td scope='row'>" + (response.timeZoneStamp[0] === "-" ? "UTC" + response.timeZoneStamp : "UTC+" + response.timeZoneStamp) + "</td></tr>";
+                document.getElementById("insertion").innerHTML += tableAlert;
                 document.getElementById("insertion").lastChild.innerHTML += '<i class="material-icons float-right">alarm_on</i>';
             }
         };
         xhttp.open("POST", "http://localhost:25648/api/currenttime", true);
         xhttp.setRequestHeader("Content-type", "application/json");
-        xhttp.send(document.getElementById("timeZone").selectedIndex);
+        xhttp.send(JSON.stringify(timeObj));
+        //xhttp.send(document.getElementById("timeZone").selectedIndex);
     }
 </script>
 <div class="input-group py-3 mb-1">
     <div class="input-group-prepend">
         <label class="input-group-text" for="timeZone"><i class="material-icons">update</i>Options</label>
     </div>
-    <select id="timeZone" class="custom-select" tabindex="0" data-toggle="tooltip" title="Adjusts server time to requested time zone.">
+    <select id="timeZone" class="custom-select" tabindex="1" data-toggle="tooltip" title="Adjusts server time to requested time zone.">
         <!--table entries added via above with javaScript xhttp request-->
     </select>
-    <div class="input-group-append">
-        <button class="btn btn-outline-success" type="submit" onclick="UserAction()" tabindex="1" data-toggle="tooltip" title="Saves requested server and time zone. Additionally, commits current UTC-time and client IP.">Get the time</button>
+    <div class="input-group-append"> 
+        <label class="input-group-text" for="daylightsavings" tabindex="2" data-toggle="tooltip" 
+               title="Check the box if your area is currently observing daylight saving time.">
+            <input id="daylightsavings" type="checkbox">
+                <i class="material-icons">brightness_medium</i>Daylight Savings
+        </label>
+        <button class="btn btn-outline-success" type="submit" onclick="UserAction()" tabindex="3" data-toggle="tooltip"
+                title="Saves the server time in requested time zone offset">Get the time</button>
     </div>
 </div>
 <table class="table table-hover table-responsive-lg">
