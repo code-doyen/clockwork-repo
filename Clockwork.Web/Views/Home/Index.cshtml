@@ -1,104 +1,26 @@
-﻿<script>
-    document.onreadystatechange = () => {
-        if (document.readyState === 'complete') {
-            // document ready
-            PopulateSelector();
-            PopulateTable();
-            $(function () {
-                $('[data-toggle="tooltip"]').tooltip()
-            });
-        }
-    };
-    function PopulateSelector() {
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 200) {
-                var response = JSON.parse(this.responseText);
-                var zones = "";
-                for (var i = 0; i < response.length; i++) {
-                    zones += (response[i].StandardName === "Coordinated Universal Time" ?
-                        "<option selected value='" + response[i].BaseUtcOffset + "'>" + response[i].DisplayName + "</option>" :
-                        "<option value='" + response[i].BaseUtcOffset + "'>" + response[i].DisplayName + "</option>");
-                } 
-                document.getElementById("timeZone").innerHTML = zones;
-                document.getElementById("btn").disabled = false;
-            }
-        };
-        xhttp.open("GET", "http://localhost:25648/api/currenttime/zoneselector", true);
-        xhttp.setRequestHeader("Content-type", "application/json");
-        xhttp.send();
-    }
-    function PopulateTable() {
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 200) {
-                var response = JSON.parse(this.responseText);
-                var table = "";
-                for (var tr = 0; tr < response.length; tr++) {
-                    table += "<tr><td scope='row'>" + response[tr].currentTimeQueryId + "</td>";
-                    table += "<td scope='row'>" + moment(response[tr].time).format("MM/DD/YYYY hh:mm:ss A") + "</td>"; 
-                    table += "<td scope='row'>" + response[tr].clientIp + "</td>";
-                    table += "<td scope='row'>" + moment(response[tr].utcTime).format("MM/DD/YYYY hh:mm:ss A") + "</td>";
-                    table += "<td scope='row'>" + (response[tr].timeZoneStamp[0] === "-" ? "UTC" + response[tr].timeZoneStamp : "UTC+" + response[tr].timeZoneStamp) + "</td></tr>";
-                }
-                document.getElementById("output").innerHTML += table;
-            }
-        };
-        xhttp.open("GET", "http://localhost:25648/api/currenttime/selectall", true);
-        xhttp.setRequestHeader("Content-type", "application/json");
-        xhttp.send();
-    }
-    function UserAction() {
-        var xhttp = new XMLHttpRequest();
-        var timeOffset = document.getElementById("timeZone").value.split(':');
-        var timeObj = {
-            Hours: timeOffset[0],
-            Minutes: timeOffset[1],
-            Seconds: timeOffset[2],
-            IsDaylightSavings: document.getElementById("daylightsavings").checked
-        };
-         
-        xhttp.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 200) {
-                document.getElementById("output").innerHTML = '<tr id="insertion" class="alert-success"></tr>';
-                PopulateTable();
-                var response = JSON.parse(this.responseText);
-                var tableAlert = "<tr><td scope='row'>" + response.currentTimeQueryId + "</td>";
-                tableAlert += "<td scope='row'>" + moment(response.time.replace("Z", "")).format("MM/DD/YYYY hh:mm:ss A") +"</td>";
-                tableAlert += "<td scope='row'>" + response.clientIp + "</td>";
-                tableAlert += "<td scope='row'>" + moment(response.utcTime.replace("Z", "")).format("MM/DD/YYYY hh:mm:ss A") + "</td>";
-                tableAlert += "<td scope='row'>" + (response.timeZoneStamp[0] === "-" ? "UTC" + response.timeZoneStamp : "UTC+" + response.timeZoneStamp) + "</td></tr>";
-                document.getElementById("insertion").innerHTML += tableAlert;
-                document.getElementById("insertion").lastChild.innerHTML += '<i class="material-icons float-right">alarm_on</i>';
-            }
-        };
-        xhttp.open("POST", "http://localhost:25648/api/currenttime", true);
-        xhttp.setRequestHeader("Content-type", "application/json");
-        xhttp.send(JSON.stringify(timeObj));
-        //xhttp.send(document.getElementById("timeZone").selectedIndex);
-    }
-</script>
-<div class="input-group py-3 mb-1">
+﻿<div class="input-group py-3 mb-1">
     <div class="input-group-prepend">
         <label class="input-group-text" for="timeZone"><i class="material-icons">update</i>Options</label>
     </div>
-    <select id="timeZone" class="custom-select" tabindex="1" data-toggle="tooltip" title="Adjusts server time to requested time zone.">
-        <!--table entries added via above with javaScript xhttp request-->
+    <select id="timeZone" class="custom-select" tabindex="1" data-toggle="tooltip" title="Adjusts server time to requested time zone."
+            ng-model="timezone.DisplayName" ng-options="timezone.DisplayName for timezone in vm.timezones track by timezone.BaseUtcOffset">
     </select>
-    <div class="input-group-append"> 
-        <label class="input-group-text" for="daylightsavings" tabindex="2" data-toggle="tooltip" 
+    <div class="input-group-append">
+        <label class="input-group-text" for="daylightsavings" tabindex="2" data-toggle="tooltip"
                title="Check the box if your area is currently observing daylight saving time.">
             <input id="daylightsavings" type="checkbox">
-                <i class="material-icons">brightness_medium</i>Daylight Savings
+            <i class="material-icons">brightness_medium</i>Daylight Savings
         </label>
-        <button id="btn" class="btn btn-outline-success" type="submit" onclick="UserAction()" tabindex="3" data-toggle="tooltip"
-                title="Saves the server time in requested time zone offset" disabled>Get the time</button>
+        <button id="btn" class="btn btn-outline-success"  tabindex="3" data-toggle="tooltip"
+                title="Saves the server time in requested time zone offset" ng-click="vm.UserActionAlert()" ng-disabled="!timezone.DisplayName">
+            Get the time
+        </button>
     </div>
 </div>
 <table class="table table-hover table-responsive-lg">
     <thead>
         <tr>
-            <th scope="col" >Id#</th>
+            <th scope="col">Id#</th>
             <th scope="col">Server Time</th>
             <th scope="col">Client IP</th>
             <th scope="col">UTC Time</th>
@@ -106,7 +28,20 @@
         </tr>
     </thead>
     <tbody id="output">
-        <tr id="insertion" class="alert-success"></tr>
-        <!--table entries added via above with javaScript xhttp request and Jquery -->
+        <tr id="insertion" class="alert-success" hidden>
+            <td scope='row'>{{vm.tuple.currentTimeQueryId}}</td>
+            <td scope='row'>{{vm.tuple.time  | date:"MM/dd/yyyy 'at' hh:mm:ssa" }}</td>
+            <td scope='row'>{{vm.tuple.clientIp}}</td>
+            <td scope='row'>{{vm.tuple.utcTime  | date:"MM/dd/yyyy 'at' hh:mm:ssa" }}</td>
+            <td scope='row'>{{vm.tuple.timeZoneStamp}}<i class="material-icons float-right">alarm_on</i></td>
+        </tr>
+        <!--table entries added via above with Angular -->
+        <tr ng-repeat="tuple in vm.tuples">
+            <td scope='row'>{{tuple.currentTimeQueryId}}</td>
+            <td scope='row'>{{tuple.time | date:"MM/dd/yyyy 'at' hh:mm:ssa"}}</td>
+            <td scope='row'>{{tuple.clientIp}}</td>
+            <td scope='row'>{{tuple.utcTime | date:"MM/dd/yyyy 'at' hh:mm:ssa"}}</td>
+            <td scope='row'>{{tuple.timeZoneStamp}}</td>
+        </tr>
     </tbody>
 </table>

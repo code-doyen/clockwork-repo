@@ -1,5 +1,5 @@
 ﻿<!doctype html>
-<html lang="en">
+<html lang="en" ng-app="clockwork">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes" />
@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="~/Content/bootstrap.css">
     <script type="text/javascript" src="~/Scripts/modernizr-2.8.3.js"></script>
 </head>
-<body>
+<body ng-controller="mainController as vm">
 
     <nav class="navbar navbar-expand navbar-dark flex-column flex-md-row bg-dark">
         <a class="navbar-brand display-1" href="#">
@@ -26,8 +26,15 @@
 
     <script type="text/javascript" src="~/Scripts/jquery-3.3.1.js"></script>
     <script type="text/javascript" src="~/Scripts/bootstrap.bundle.js"></script>
+    <script type="text/javascript" src="~/Scripts/angular.js"></script>
+    <script type="text/javascript" src="~/Scripts/angular-mocks.js"></script>
     <script type="text/javascript" src="~/Scripts/respond.js"></script>
-    <script type="text/javascript" src="~/Scripts/moment.js"></script>
+    <script type="text/javascript" src="~/Scripts/app.js"></script>
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        });
+    </script>
     @RenderSection("scripts", required: false)
 </body>
 </html>

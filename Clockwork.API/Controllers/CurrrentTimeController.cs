@@ -6,13 +6,7 @@ namespace Clockwork.API.Controllers
 {    
     public class CurrentTimeController : Controller
     {
-        public class TimeModel
-        {
-            public int Hours { get; set; }
-            public int Minutes { get; set; }
-            public int Seconds { get; set; }
-            public bool IsDaylightSavings { get; set; }
-        }
+        
         // Post api/currenttime
         [HttpPost]
         [Route("api/[controller]")]
@@ -30,10 +24,9 @@ namespace Clockwork.API.Controllers
 
             var utcTime = DateTime.UtcNow;
             //Get server time in the requested time zone
-            var serverTime = DateTime.Now.ToUniversalTime();
-            var serverTimeZoneAdjusted = serverTime.AddHours(timeOffset.Hours).AddMinutes(timeOffset.Minutes).AddSeconds(timeOffset.Seconds);
+            var serverTime = utcTime.AddHours(timeOffset.Hours).AddMinutes(timeOffset.Minutes).AddSeconds(timeOffset.Seconds);
             var ip = this.HttpContext.Connection.RemoteIpAddress.ToString();
-            var timeZoneStamp = serverTimeZoneAdjusted.Subtract(serverTime).ToString();
+            var timeZoneStamp = serverTime.Subtract(utcTime).ToString();
 
             //Stores requested timeszone's metadata
             //var timeZone = TimeZoneInfo.GetSystemTimeZones()[timeID];
@@ -47,7 +40,7 @@ namespace Clockwork.API.Controllers
             {
                 UTCTime = utcTime,
                 ClientIp = ip,
-                Time = serverTimeZoneAdjusted,
+                Time = serverTime,
                 TimeZoneStamp = timeZoneStamp
             };
 

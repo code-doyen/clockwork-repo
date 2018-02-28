@@ -21,4 +21,12 @@ namespace Clockwork.API.Models
         public DateTime UTCTime { get; set; }
         public string TimeZoneStamp { get; set; }
     }
+
+    public class TimeModel
+    {
+        public int Hours { get; set; }
+        public int Minutes { get; set; }
+        public int Seconds { get; set; }
+        public bool IsDaylightSavings { get; set; }
+    }
 }
